@@ -31,7 +31,7 @@ Hari ini kita mulai berbagi ilmu dan produk digital. Stay tuned untuk tips, tuto
 
 ## 📞 Kontak
 - WhatsApp: [0895-1313-2933](https://wa.me/6289513132933)  
-- Email: **thepowerofberbagi@example.com** (contoh, bisa ganti nanti)  
+- Email: **id12us@gmmail.com**  
 
 ---
 
