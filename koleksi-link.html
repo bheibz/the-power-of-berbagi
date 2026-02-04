@@ -75,57 +75,17 @@
             <p data-i18n="koleksi_lead">
               Berikut contoh format koleksi. Setelah kamu kirim link, tim akan kurasi dan tampilkan di sini.
             </p>
+            <div class="section-links">
+              <a class="link-inline" href="https://github.com/bheibz-digital-media/berbagi-links" target="_blank" rel="noreferrer" data-i18n="koleksi_repo_link">Repo Kontribusi</a>
+              <a class="link-inline" href="https://raw.githubusercontent.com/bheibz-digital-media/berbagi-links/main/links.json" target="_blank" rel="noreferrer" data-i18n="koleksi_data_link">Lihat Data JSON</a>
+            </div>
           </div>
-          <div class="gallery-grid">
-            <a class="gallery-card" href="https://github.com/google-gemini/gemini-cli" target="_blank" rel="noreferrer">
-              <span class="gallery-tag">CLI</span>
-              <h3>Gemini CLI</h3>
-              <p>Open-source terminal AI agent dari Google.</p>
-              <span class="gallery-link">Buka Repo</span>
-            </a>
-            <a class="gallery-card" href="https://github.com/QwenLM/qwen-code" target="_blank" rel="noreferrer">
-              <span class="gallery-tag">CLI</span>
-              <h3>Qwen Code</h3>
-              <p>AI agent terminal untuk Qwen3-Coder.</p>
-              <span class="gallery-link">Buka Repo</span>
-            </a>
-            <a class="gallery-card" href="https://github.com/openai/codex" target="_blank" rel="noreferrer">
-              <span class="gallery-tag">CLI</span>
-              <h3>Codex</h3>
-              <p>Agent coding ringan dari OpenAI.</p>
-              <span class="gallery-link">Buka Repo</span>
-            </a>
-            <a class="gallery-card" href="https://github.com/brave/brave-browser" target="_blank" rel="noreferrer">
-              <span class="gallery-tag">Browser</span>
-              <h3>Brave Browser</h3>
-              <p>Repositori utama browser Brave.</p>
-              <span class="gallery-link">Buka Repo</span>
-            </a>
-            <a class="gallery-card" href="https://github.com/cli/cli" target="_blank" rel="noreferrer">
-              <span class="gallery-tag">CLI</span>
-              <h3>GitHub CLI</h3>
-              <p>Tool resmi GitHub untuk terminal.</p>
-              <span class="gallery-link">Buka Repo</span>
-            </a>
-            <a class="gallery-card" href="https://github.com/vishesharya/Free-Design-Resources" target="_blank" rel="noreferrer">
-              <span class="gallery-tag">Design</span>
-              <h3>Free Design Resources</h3>
-              <p>Kumpulan UI resources dan template gratis.</p>
-              <span class="gallery-link">Buka Repo</span>
-            </a>
-            <a class="gallery-card" href="https://github.com/EbookFoundation/free-programming-books" target="_blank" rel="noreferrer">
-              <span class="gallery-tag">Belajar</span>
-              <h3>Free Programming Books</h3>
-              <p>Daftar buku belajar pemrograman gratis.</p>
-              <span class="gallery-link">Buka Repo</span>
-            </a>
-            <a class="gallery-card" href="https://github.com/public-apis/public-apis" target="_blank" rel="noreferrer">
-              <span class="gallery-tag">API</span>
-              <h3>Public APIs</h3>
-              <p>Direktori API publik gratis.</p>
-              <span class="gallery-link">Buka Repo</span>
-            </a>
+          <div class="filter-bar">
+            <span class="filter-label" data-i18n="filter_label">Filter Kategori:</span>
+            <div class="filter-buttons" id="filterButtons"></div>
           </div>
+          <div class="gallery-grid" id="galleryGrid"></div>
+          <p class="empty-state" id="emptyState" data-i18n="empty_state">Belum ada link yang ditampilkan.</p>
         </div>
       </section>
 
@@ -202,6 +162,11 @@
           koleksi_title: "Koleksi Link",
           koleksi_lead:
             "Berikut contoh format koleksi. Setelah kamu kirim link, tim akan kurasi dan tampilkan di sini.",
+          koleksi_repo_link: "Repo Kontribusi",
+          koleksi_data_link: "Lihat Data JSON",
+          filter_label: "Filter Kategori:",
+          filter_all: "Semua",
+          empty_state: "Belum ada link yang ditampilkan.",
           kontribusi_title: "Cara Kontribusi Link",
           kontribusi_lead:
             "Gunakan format sederhana agar tim mudah memverifikasi dan menampilkan link kamu.",
@@ -241,6 +206,11 @@
           koleksi_title: "Link Collection",
           koleksi_lead:
             "Below is a sample layout. After you submit a link, the team will curate and show it here.",
+          koleksi_repo_link: "Contribution Repo",
+          koleksi_data_link: "View JSON Data",
+          filter_label: "Filter Category:",
+          filter_all: "All",
+          empty_state: "No links to display yet.",
           kontribusi_title: "How to Contribute",
           kontribusi_lead:
             "Use a simple format so the team can verify and publish your link quickly.",
@@ -262,6 +232,13 @@
 
       const langButtons = document.querySelectorAll(".lang-btn");
       const elements = document.querySelectorAll("[data-i18n]");
+      const galleryGrid = document.getElementById("galleryGrid");
+      const filterButtons = document.getElementById("filterButtons");
+      const emptyState = document.getElementById("emptyState");
+      const dataUrl = "https://raw.githubusercontent.com/bheibz-digital-media/berbagi-links/main/links.json";
+      let allLinks = [];
+      let currentLang = "id";
+      let currentCategory = "all";
 
       function setLanguage(lang) {
         const dict = translations[lang] || translations.id;
@@ -274,14 +251,84 @@
         langButtons.forEach((btn) => {
           btn.classList.toggle("is-active", btn.dataset.lang === lang);
         });
+        currentLang = lang;
         localStorage.setItem("lang", lang);
+        renderFilters();
+        renderGallery();
       }
 
       langButtons.forEach((btn) => {
         btn.addEventListener("click", () => setLanguage(btn.dataset.lang));
       });
 
+      function makeButton(label, value, isActive) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `filter-btn${isActive ? " is-active" : ""}`;
+        btn.textContent = label;
+        btn.addEventListener("click", () => {
+          currentCategory = value;
+          renderFilters();
+          renderGallery();
+        });
+        return btn;
+      }
+
+      function renderFilters() {
+        if (!filterButtons) return;
+        const dict = translations[currentLang] || translations.id;
+        const categories = Array.from(
+          new Set(allLinks.map((item) => (item.category || "Lainnya").trim()))
+        ).filter(Boolean);
+        filterButtons.innerHTML = "";
+        filterButtons.appendChild(
+          makeButton(dict.filter_all, "all", currentCategory === "all")
+        );
+        categories.forEach((cat) => {
+          filterButtons.appendChild(makeButton(cat, cat, currentCategory === cat));
+        });
+      }
+
+      function renderGallery() {
+        if (!galleryGrid) return;
+        const filtered =
+          currentCategory === "all"
+            ? allLinks
+            : allLinks.filter((item) => (item.category || "").trim() === currentCategory);
+        galleryGrid.innerHTML = "";
+        filtered.forEach((item) => {
+          const card = document.createElement("a");
+          card.className = "gallery-card";
+          card.href = item.url;
+          card.target = "_blank";
+          card.rel = "noreferrer";
+          card.innerHTML = `
+            <span class="gallery-tag">${item.category || "Link"}</span>
+            <h3>${item.title || "Tanpa Judul"}</h3>
+            <p>${item.description || "Tanpa deskripsi."}</p>
+            <span class="gallery-link">Buka Repo</span>
+          `;
+          galleryGrid.appendChild(card);
+        });
+        emptyState.style.display = filtered.length ? "none" : "block";
+      }
+
+      async function loadLinks() {
+        try {
+          const res = await fetch(dataUrl, { cache: "no-store" });
+          if (!res.ok) throw new Error("Failed to load links");
+          const data = await res.json();
+          allLinks = Array.isArray(data) ? data : [];
+        } catch (err) {
+          allLinks = [];
+        } finally {
+          renderFilters();
+          renderGallery();
+        }
+      }
+
       setLanguage(localStorage.getItem("lang") || "id");
+      loadLinks();
     </script>
   </body>
 </html>
