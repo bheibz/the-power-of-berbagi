@@ -387,6 +387,58 @@ h1 {
   color: var(--muted);
 }
 
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.gallery-card {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  min-height: 160px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
+}
+
+.gallery-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.gallery-tag {
+  align-self: start;
+  justify-self: start;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--accent-3);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.gallery-card h3 {
+  font-size: 1.1rem;
+}
+
+.gallery-card p {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.gallery-link {
+  color: var(--accent-2);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
 .icon-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(56px, 1fr));
