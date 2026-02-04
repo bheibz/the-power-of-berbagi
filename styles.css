@@ -439,6 +439,7 @@ h1 {
   font-size: 0.9rem;
 }
 
+
 .icon-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(56px, 1fr));
